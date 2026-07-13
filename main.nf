@@ -5,6 +5,9 @@ include { FASTCAT } from './modules/local/fastcat/main'
 
 workflow {
 
+    /*
+     * Check required inputs
+     */
     if (!params.summary) {
         error "Please provide --summary /path/to/sequencing_summary.txt"
     }
@@ -26,17 +29,32 @@ workflow {
     PYCOQC(summary_ch)
 
     /*
-     * Barcode-level FASTQ concatenation
+     * Read sample metadata and locate each barcode directory
      */
-    barcode_ch = Channel
+    samples_ch = Channel
         .fromPath(
-            "${params.fastq_dir}/barcode*",
-            type: 'dir',
+            "${projectDir}/assets/samples.csv",
             checkIfExists: true
         )
-        .map { barcode_dir ->
-            tuple(barcode_dir.baseName, barcode_dir)
+        .splitCsv(header: true)
+        .map { row ->
+
+            def meta = [
+                barcode  : row.barcode,
+                sample   : row.sample,
+                condition: row.condition
+            ]
+
+            def barcode_dir = file(
+                "${params.fastq_dir}/${row.barcode}",
+                checkIfExists: true
+            )
+
+            tuple(meta, barcode_dir)
         }
 
-    FASTCAT(barcode_ch)
+    /*
+     * Barcode-level FASTQ concatenation
+     */
+    FASTCAT(samples_ch)
 }

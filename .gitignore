@@ -1,0 +1,22 @@
+# Nextflow
+.nextflow/
+.nextflow.log*
+
+# Outputs
+results/
+work/
+
+# Large sequencing files
+*.fastq
+*.fastq.gz
+*.fq
+*.fq.gz
+*.bam
+*.bai
+
+# Containers
+*.img
+*.sif
+
+# macOS
+.DS_Store

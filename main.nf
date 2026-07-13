@@ -1,12 +1,19 @@
 nextflow.enable.dsl = 2
 
-params.input = "${projectDir}/assets/samples.csv"
+include { PYCOQC } from './modules/local/pycoqc/main'
 
 workflow {
 
-    samples_ch = Channel
-        .fromPath(params.input)
-        .splitCsv(header: true)
+    if (!params.summary) {
+        error "Please provide --summary /path/to/sequencing_summary.txt"
+    }
 
-    samples_ch.view()
+    summary_ch = Channel.of(
+        tuple(
+            [id: params.run_id],
+            file(params.summary, checkIfExists: true)
+        )
+    )
+
+    PYCOQC(summary_ch)
 }

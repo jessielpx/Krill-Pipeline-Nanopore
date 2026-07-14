@@ -8,6 +8,7 @@ include { MINIMAP2_ALIGN }        from './modules/local/minimap2_align/main'
 include { SAMTOOLS_SORT }         from './modules/local/samtools_sort/main'
 include { SAMTOOLS_INDEX }        from './modules/local/samtools_index/main'
 include { STRINGTIE_ASSEMBLY }    from './modules/local/stringtie_assembly/main'
+include { STRINGTIE_MERGE }       from './modules/local/stringtie_merge/main'
 
 workflow {
 
@@ -89,7 +90,7 @@ workflow {
     BUILD_MINIMAP2_INDEX(reference_fasta_ch)
 
     /*
-     * Clean and validate the reference annotation
+     * Clean the reference annotation
      */
     PREPROCESS_ANNOTATION(
         annotation_gtf_ch,
@@ -113,7 +114,7 @@ workflow {
     minimap_index_ch = BUILD_MINIMAP2_INDEX.out.first()
 
     /*
-     * Align merged FASTQ files to the reference
+     * Align merged FASTQ files
      */
     MINIMAP2_ALIGN(
         merged_fastq_ch,
@@ -121,7 +122,7 @@ workflow {
     )
 
     /*
-     * Sort SAM files into coordinate-sorted BAM files
+     * Sort SAM files
      */
     SAMTOOLS_SORT(
         MINIMAP2_ALIGN.out.sam
@@ -135,15 +136,33 @@ workflow {
     )
 
     /*
-     * Reuse the cleaned annotation for every sample
+     * Reuse cleaned annotation for every sample
      */
     cleaned_gtf_ch = PREPROCESS_ANNOTATION.out.cleaned_gtf.first()
 
     /*
-     * Assemble sample-level transcripts with StringTie
+     * Assemble transcripts separately for each sample
      */
     STRINGTIE_ASSEMBLY(
         SAMTOOLS_INDEX.out.indexed_bam,
         cleaned_gtf_ch
+    )
+
+    /*
+     * Collect all sample-level assembled GTF files
+     */
+    assembled_gtfs_ch = STRINGTIE_ASSEMBLY.out.assembled_gtf
+        .map { meta, assembled_gtf ->
+            assembled_gtf
+        }
+        .collect()
+
+    /*
+     * Merge all sample transcriptomes
+     */
+    STRINGTIE_MERGE(
+        assembled_gtfs_ch,
+        cleaned_gtf_ch,
+        reference_fasta_ch
     )
 }

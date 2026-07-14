@@ -3,7 +3,10 @@ nextflow.enable.dsl = 2
 include { PYCOQC }               from './modules/local/pycoqc/main'
 include { FASTCAT }              from './modules/local/fastcat/main'
 include { BUILD_MINIMAP2_INDEX } from './modules/local/build_minimap2_index/main'
+include { PREPROCESS_ANNOTATION } from './modules/local/preprocess_annotation/main'
 include { MINIMAP2_ALIGN }       from './modules/local/minimap2_align/main'
+include { SAMTOOLS_SORT }        from './modules/local/samtools_sort/main'
+include { SAMTOOLS_INDEX }       from './modules/local/samtools_index/main'
 
 workflow {
 
@@ -22,10 +25,14 @@ workflow {
         error "Please provide --ref_genome /path/to/reference.fa"
     }
 
+    if (!params.ref_annotation) {
+        error "Please provide --ref_annotation /path/to/annotation.gtf"
+    }
+
     /*
      * Run-level quality control
      */
-    summary_ch = Channel.of(
+    summary_ch = Channel.value(
         tuple(
             [id: params.run_id],
             file(params.summary, checkIfExists: true)
@@ -60,18 +67,33 @@ workflow {
         }
 
     /*
-     * Merge FASTQ files and generate fastcat statistics
+     * Merge FASTQ files and generate Fastcat statistics
      */
     FASTCAT(samples_ch)
 
     /*
-     * Build Minimap2 reference index
+     * Reusable reference inputs
      */
-    reference_ch = Channel.of(
+    reference_fasta_ch = Channel.value(
         file(params.ref_genome, checkIfExists: true)
     )
 
-    BUILD_MINIMAP2_INDEX(reference_ch)
+    annotation_gtf_ch = Channel.value(
+        file(params.ref_annotation, checkIfExists: true)
+    )
+
+    /*
+     * Build Minimap2 reference index
+     */
+    BUILD_MINIMAP2_INDEX(reference_fasta_ch)
+
+    /*
+     * Clean and validate the reference annotation
+     */
+    PREPROCESS_ANNOTATION(
+        annotation_gtf_ch,
+        reference_fasta_ch
+    )
 
     /*
      * Extract merged FASTQ files from FASTCAT output
@@ -85,12 +107,29 @@ workflow {
     }
 
     /*
-     * Align merged FASTQ files to the reference
+     * Reuse the same Minimap2 index for every sample
      */
     minimap_index_ch = BUILD_MINIMAP2_INDEX.out.first()
 
+    /*
+     * Align merged FASTQ files to the reference
+     */
     MINIMAP2_ALIGN(
         merged_fastq_ch,
         minimap_index_ch
+    )
+
+    /*
+     * Sort SAM files into coordinate-sorted BAM files
+     */
+    SAMTOOLS_SORT(
+        MINIMAP2_ALIGN.out.sam
+    )
+
+    /*
+     * Index sorted BAM files
+     */
+    SAMTOOLS_INDEX(
+        SAMTOOLS_SORT.out.bam
     )
 }

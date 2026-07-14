@@ -13,6 +13,7 @@ include { BUILD_TRANSCRIPTOME_INDEX } from './modules/local/build_transcriptome_
 include { MAP_TRANSCRIPTOME }         from './modules/local/map_transcriptome/main'
 include { SALMON_QUANT }              from './modules/local/salmon_quant/main'
 include { MERGE_TRANSCRIPT_COUNTS }   from './modules/local/merge_transcript_counts/main'
+include { ANNOTATE_AND_SUM_COUNTS } from './modules/local/annotate_and_sum_counts/main'
 
 
 workflow {
@@ -239,4 +240,18 @@ workflow {
         transcript_count_files_ch,
         merge_script_ch
     )
+
+    annotation_script_ch = Channel.value(
+        file(
+            "${projectDir}/bin/add_gene_ids_and_sum_counts.py",
+            checkIfExists: true
+        )
+    )
+
+    ANNOTATE_AND_SUM_COUNTS(
+        MERGE_TRANSCRIPT_COUNTS.out.counts,
+        STRINGTIE_MERGE.out.merged_gtf,
+        annotation_script_ch
+    )
+
 }

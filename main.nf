@@ -1,14 +1,17 @@
 nextflow.enable.dsl = 2
 
-include { PYCOQC }                from './modules/local/pycoqc/main'
-include { FASTCAT }               from './modules/local/fastcat/main'
-include { BUILD_MINIMAP2_INDEX }  from './modules/local/build_minimap2_index/main'
-include { PREPROCESS_ANNOTATION } from './modules/local/preprocess_annotation/main'
-include { MINIMAP2_ALIGN }        from './modules/local/minimap2_align/main'
-include { SAMTOOLS_SORT }         from './modules/local/samtools_sort/main'
-include { SAMTOOLS_INDEX }        from './modules/local/samtools_index/main'
-include { STRINGTIE_ASSEMBLY }    from './modules/local/stringtie_assembly/main'
-include { STRINGTIE_MERGE }       from './modules/local/stringtie_merge/main'
+include { PYCOQC }                    from './modules/local/pycoqc/main'
+include { FASTCAT }                    from './modules/local/fastcat/main'
+include { BUILD_MINIMAP2_INDEX }       from './modules/local/build_minimap2_index/main'
+include { PREPROCESS_ANNOTATION }      from './modules/local/preprocess_annotation/main'
+include { MINIMAP2_ALIGN }             from './modules/local/minimap2_align/main'
+include { SAMTOOLS_SORT }              from './modules/local/samtools_sort/main'
+include { SAMTOOLS_INDEX }             from './modules/local/samtools_index/main'
+include { STRINGTIE_ASSEMBLY }         from './modules/local/stringtie_assembly/main'
+include { STRINGTIE_MERGE }            from './modules/local/stringtie_merge/main'
+include { BUILD_TRANSCRIPTOME_INDEX }  from './modules/local/build_transcriptome_index/main'
+include { MAP_TRANSCRIPTOME }          from './modules/local/map_transcriptome/main'
+include { SALMON_QUANT }               from './modules/local/salmon_quant/main'
 
 workflow {
 
@@ -85,12 +88,12 @@ workflow {
     )
 
     /*
-     * Build Minimap2 reference index
+     * Build genome Minimap2 index
      */
     BUILD_MINIMAP2_INDEX(reference_fasta_ch)
 
     /*
-     * Clean the reference annotation
+     * Clean reference annotation
      */
     PREPROCESS_ANNOTATION(
         annotation_gtf_ch,
@@ -109,27 +112,27 @@ workflow {
     }
 
     /*
-     * Reuse the same Minimap2 index for every sample
+     * Reuse genome index for every sample
      */
-    minimap_index_ch = BUILD_MINIMAP2_INDEX.out.first()
+    genome_index_ch = BUILD_MINIMAP2_INDEX.out.first()
 
     /*
-     * Align merged FASTQ files
+     * Align reads to the genome
      */
     MINIMAP2_ALIGN(
         merged_fastq_ch,
-        minimap_index_ch
+        genome_index_ch
     )
 
     /*
-     * Sort SAM files
+     * Sort genome-aligned SAM files
      */
     SAMTOOLS_SORT(
         MINIMAP2_ALIGN.out.sam
     )
 
     /*
-     * Index sorted BAM files
+     * Index genome-aligned BAM files
      */
     SAMTOOLS_INDEX(
         SAMTOOLS_SORT.out.bam
@@ -164,5 +167,40 @@ workflow {
         assembled_gtfs_ch,
         cleaned_gtf_ch,
         reference_fasta_ch
+    )
+
+    /*
+     * Reuse merged transcriptome FASTA
+     */
+    transcriptome_fasta_ch =
+        STRINGTIE_MERGE.out.transcriptome_fasta.first()
+
+    /*
+     * Build Minimap2 index for the merged transcriptome
+     */
+    BUILD_TRANSCRIPTOME_INDEX(
+        transcriptome_fasta_ch
+    )
+
+    /*
+     * Reuse transcriptome index for every sample
+     */
+    transcriptome_index_ch =
+        BUILD_TRANSCRIPTOME_INDEX.out.index.first()
+
+    /*
+     * Align reads to the merged transcriptome
+     */
+    MAP_TRANSCRIPTOME(
+        merged_fastq_ch,
+        transcriptome_index_ch
+    )
+
+    /*
+     * Quantify transcript abundance
+     */
+    SALMON_QUANT(
+        MAP_TRANSCRIPTOME.out.bam,
+        transcriptome_fasta_ch
     )
 }

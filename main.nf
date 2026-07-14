@@ -1,12 +1,13 @@
 nextflow.enable.dsl = 2
 
-include { PYCOQC }               from './modules/local/pycoqc/main'
-include { FASTCAT }              from './modules/local/fastcat/main'
-include { BUILD_MINIMAP2_INDEX } from './modules/local/build_minimap2_index/main'
+include { PYCOQC }                from './modules/local/pycoqc/main'
+include { FASTCAT }               from './modules/local/fastcat/main'
+include { BUILD_MINIMAP2_INDEX }  from './modules/local/build_minimap2_index/main'
 include { PREPROCESS_ANNOTATION } from './modules/local/preprocess_annotation/main'
-include { MINIMAP2_ALIGN }       from './modules/local/minimap2_align/main'
-include { SAMTOOLS_SORT }        from './modules/local/samtools_sort/main'
-include { SAMTOOLS_INDEX }       from './modules/local/samtools_index/main'
+include { MINIMAP2_ALIGN }        from './modules/local/minimap2_align/main'
+include { SAMTOOLS_SORT }         from './modules/local/samtools_sort/main'
+include { SAMTOOLS_INDEX }        from './modules/local/samtools_index/main'
+include { STRINGTIE_ASSEMBLY }    from './modules/local/stringtie_assembly/main'
 
 workflow {
 
@@ -131,5 +132,18 @@ workflow {
      */
     SAMTOOLS_INDEX(
         SAMTOOLS_SORT.out.bam
+    )
+
+    /*
+     * Reuse the cleaned annotation for every sample
+     */
+    cleaned_gtf_ch = PREPROCESS_ANNOTATION.out.cleaned_gtf.first()
+
+    /*
+     * Assemble sample-level transcripts with StringTie
+     */
+    STRINGTIE_ASSEMBLY(
+        SAMTOOLS_INDEX.out.indexed_bam,
+        cleaned_gtf_ch
     )
 }

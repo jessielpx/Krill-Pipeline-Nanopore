@@ -226,11 +226,6 @@ Enter the repository:
 cd Krill-Pipeline-Nanopore
 ```
 
-Check that the repository was downloaded correctly:
-
-```bash
-ls
-```
 
 The repository should contain files and directories similar to:
 

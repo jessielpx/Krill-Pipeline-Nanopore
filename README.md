@@ -6,8 +6,16 @@ The pipeline was designed for running on Rorqual, that's why I named it "Krill".
 
 # Overview
 [Pipeline workflow](https://github.com/jessielpx/Krill-Pipeline-Nanopore/blob/main/README.md#pipeline-workflow)
-https://github.com/jessielpx/Krill-Pipeline-Nanopore/blob/main/README.md#before-you-start
 
+[Before you start](https://github.com/jessielpx/Krill-Pipeline-Nanopore/blob/main/README.md#before-you-start)
+
+[Input files]()
+
+[Prepare the pipeline]()
+
+[Running the pipeline]()
+
+[Outputs]()
 
 
 # Pipeline workflow
@@ -185,7 +193,7 @@ For our laboratory, this directory is available in the shared folder.
 
 ---
 
-# Preparing the pipeline
+# Prepare the pipeline
 
 ## 1. Choose a project directory
 
@@ -283,7 +291,7 @@ sbatch run_batch2.sh
 
 ---
 
-# Output directory
+# Outputs
 
 After completion, the run directory contains:
 

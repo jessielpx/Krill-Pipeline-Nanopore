@@ -9,13 +9,13 @@ The pipeline was designed for running on Rorqual, that's why I named it "Krill".
 
 [Before you start](https://github.com/jessielpx/Krill-Pipeline-Nanopore/blob/main/README.md#before-you-start)
 
-[Input files]()
+[Input files](https://github.com/jessielpx/Krill-Pipeline-Nanopore/blob/main/README.md#input-files)
 
-[Prepare the pipeline]()
+[Prepare the pipeline](https://github.com/jessielpx/Krill-Pipeline-Nanopore/blob/main/README.md#prepare-the-pipeline)
 
-[Running the pipeline]()
+[Running the pipeline](https://github.com/jessielpx/Krill-Pipeline-Nanopore/blob/main/README.md#running-the-pipeline)
 
-[Outputs]()
+[Outputs](https://github.com/jessielpx/Krill-Pipeline-Nanopore/blob/main/README.md#outputs)
 
 
 # Pipeline workflow

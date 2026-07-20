@@ -17,6 +17,7 @@ argv <- parse_args(parser)
 suppressMessages(library("DRIMSeq"))
 suppressMessages(library("GenomicFeatures"))
 suppressMessages(library("edgeR"))
+suppressMessages(library("rtracklayer"))
 
 # Some functions, including dmDSdata, converts '.' in sample IDs to '-'. 
 # Make the output DF match the sample IDs in the sample sheet
@@ -97,10 +98,52 @@ if (check_version != 0){
     }
 
 cat("Loading annotation database.\n")
-txdb <- makeTxDbFromGFF(argv$annotation,  format = annotation_type)
-txdf <- select(txdb, keys(txdb,"GENEID"), "TXNAME", "GENEID")
+txdb <- makeTxDbFromGFF(argv$annotation, format = annotation_type)
+txdf <- select(txdb, keys(txdb, "GENEID"), "TXNAME", "GENEID")
 tab <- table(txdf$GENEID)
-txdf$ntx<- tab[match(txdf$GENEID, names(tab))]
+txdf$ntx <- tab[match(txdf$GENEID, names(tab))]
+
+# Read transcript-level attributes directly from the annotation.
+# For gene-level count output, use:
+# gene_name -> ref_gene_id -> StringTie gene_id
+annotation_gr <- rtracklayer::import(argv$annotation)
+
+annotation_df <- as.data.frame(annotation_gr)
+annotation_df <- annotation_df[
+    !is.na(annotation_df$transcript_id),
+    ,
+    drop = FALSE
+]
+
+if (!"gene_name" %in% colnames(annotation_df)) {
+    annotation_df$gene_name <- NA_character_
+}
+
+if (!"ref_gene_id" %in% colnames(annotation_df)) {
+    annotation_df$ref_gene_id <- NA_character_
+}
+
+annotation_df$output_gene_name <- ifelse(
+    !is.na(annotation_df$gene_name) & annotation_df$gene_name != "",
+    annotation_df$gene_name,
+    ifelse(
+        !is.na(annotation_df$ref_gene_id) & annotation_df$ref_gene_id != "",
+        annotation_df$ref_gene_id,
+        annotation_df$gene_id
+    )
+)
+
+transcript_gene_names <- annotation_df[
+    ,
+    c("transcript_id", "output_gene_name"),
+    drop = FALSE
+]
+
+transcript_gene_names <- transcript_gene_names[
+    !duplicated(transcript_gene_names$transcript_id),
+    ,
+    drop = FALSE
+]
 
 
 cts <- cts[rownames(cts) %in% txdf$TXNAME, ] # FIXME: filter for transcripts which are in the annotation. Why they are not all there? 
@@ -136,20 +179,66 @@ trs_cts <- counts(d)
 trs_cts <- rename_sample_columns(trs_cts, coldata$alias, 3)
 write.table(trs_cts, file=file.path(argv$merged_out_dir, "filtered_transcript_counts_with_genes.tsv"), sep="\t", row.names = FALSE, quote=FALSE)
 
-gene_cts <- trs_cts_unfiltered %>% dplyr::select(c(1, 3:ncol(trs_cts)))  %>% group_by(gene_id) %>% summarise_all(tibble::lst(sum)) %>% data.frame()
-rownames(gene_cts) <- gene_cts$gene_id
-gene_cts$gene_id <- NULL
-gene_cts <- rename_sample_columns(gene_cts, coldata$alias, 1)
-write.table(gene_cts, file=file.path(argv$merged_out_dir, "all_gene_counts.tsv"), sep="\t", quote=FALSE)
+# Match each transcript to the preferred output gene name.
+gene_name_by_transcript <- transcript_gene_names$output_gene_name[
+    match(
+        trs_cts_unfiltered$feature_id,
+        transcript_gene_names$transcript_id
+    )
+]
+
+# Fall back to the gene_id already supplied by DRIMSeq if no annotation
+# gene name was found for a transcript.
+missing_gene_name <- is.na(gene_name_by_transcript) |
+    gene_name_by_transcript == ""
+
+gene_name_by_transcript[missing_gene_name] <-
+    trs_cts_unfiltered$gene_id[missing_gene_name]
+
+# Sum transcript counts into gene-level counts.
+# Only sample columns are included in the numeric matrix.
+gene_cts_table <- aggregate(
+    trs_cts_unfiltered[, coldata$alias, drop = FALSE],
+    by = list(gene_name = gene_name_by_transcript),
+    FUN = sum
+)
+
+# Keep a purely numeric matrix for edgeR.
+gene_cts <- gene_cts_table[, coldata$alias, drop = FALSE]
+rownames(gene_cts) <- gene_cts_table$gene_name
+
+# Write a separate output table with an explicit first-column title.
+gene_cts_output <- cbind(
+    gene_name = rownames(gene_cts),
+    gene_cts
+)
+
+write.table(
+    gene_cts_output,
+    file = file.path(argv$merged_out_dir, "all_gene_counts.tsv"),
+    sep = "\t",
+    quote = FALSE,
+    row.names = FALSE
+)
 
 # Output count per million of the gene counts using edgeR CPM
 cpm_gene_counts <- cpm(gene_cts)
-# Add gene_id as index column header
-cpm_gene_counts <- cbind(var_name = rownames(cpm_gene_counts), cpm_gene_counts)
+
+# Add gene_name as an explicit first column.
+cpm_gene_counts <- cbind(
+    gene_name = rownames(cpm_gene_counts),
+    cpm_gene_counts
+)
+
 rownames(cpm_gene_counts) <- NULL
-colnames(cpm_gene_counts)[1] <- "gene_id"
-cpm_gene_counts <- rename_sample_columns(cpm_gene_counts, coldata$alias, 2)
-write.table(cpm_gene_counts, file=file.path(argv$de_out_dir, "cpm_gene_counts.tsv"), sep="\t", quote=FALSE, row.names = FALSE)
+
+write.table(
+    cpm_gene_counts,
+    file = file.path(argv$de_out_dir, "cpm_gene_counts.tsv"),
+    sep = "\t",
+    quote = FALSE,
+    row.names = FALSE
+)
 
 # Differential gene expression using edgeR:
 cat("Running differential gene expression analysis using edgeR.\n")

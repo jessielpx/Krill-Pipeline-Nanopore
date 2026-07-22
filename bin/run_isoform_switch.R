@@ -1,3 +1,26 @@
+if (!requireNamespace("BiocManager", quietly = TRUE)) {
+    install.packages(
+        "BiocManager",
+        repos = "https://cloud.r-project.org"
+    )
+}
+
+if (!requireNamespace("IsoformSwitchAnalyzeR", quietly = TRUE)) {
+
+    cat("\nIsoformSwitchAnalyzeR not found.\n")
+    cat("Installing from Bioconductor...\n\n")
+
+    BiocManager::install(
+        "IsoformSwitchAnalyzeR",
+        ask = FALSE,
+        update = FALSE
+    )
+
+    if (!requireNamespace("IsoformSwitchAnalyzeR", quietly = TRUE)) {
+        stop("Failed to install IsoformSwitchAnalyzeR.")
+    }
+}
+
 library(IsoformSwitchAnalyzeR)
 
 args <- commandArgs(trailingOnly = TRUE)

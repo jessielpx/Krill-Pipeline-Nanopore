@@ -1,8 +1,8 @@
-# Krill Renew
+# Krill Pipeline
 
 **A modular Nextflow DSL2 workflow for Nanopore long-read cDNA RNA sequencing.**
 
-Krill Renew integrates long-read preprocessing, genome alignment, transcript discovery, expression analysis, transcript usage, structural annotation, alternative splicing, and fusion detection.
+Krill Pipeline integrates long-read preprocessing, genome alignment, transcript discovery, expression analysis, transcript usage, structural annotation, alternative splicing, and fusion detection.
 
 The pipeline was developed for basal cell carcinoma (BCC) research, with particular emphasis on high-risk (HR) versus control comparisons. Its workflow architecture supports reusable sample inputs and independent analysis stages.
 

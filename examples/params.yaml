@@ -1,0 +1,78 @@
+# External software installations
+sqanti_dir: "/path/to/SQANTI3"
+sqanti_env: "/path/to/sqanti3/environment"
+jaffal_home: "/path/to/JAFFA"
+jaffal_ref_dir: "/path/to/JAFFA/reference"
+
+# R / Bioconductor environment
+r_libs_user: "/path/to/R/library"
+bioconductor_config_file: "file:///path/to/bioconductor-config.yaml"
+
+# HPC account (replace with your own)
+slurm_account: "your-slurm-account"
+
+# Krill Renew - Example parameters
+#
+# Replace the example paths with your own.
+# Choose the workflow stage when launching Nextflow.
+
+stage: "alignment"
+read_type: "cdna"
+
+# Input data
+samplesheet: "/path/to/samplesheet.csv"
+raw_fastq_dir: "/path/to/raw_fastq_by_barcode"
+merged_fastq_dir: "/path/to/results/01_preprocessing/fastcat"
+bam_dir: "/path/to/results/01_preprocessing/alignment"
+bambu_dir: "/path/to/results/02_transcriptome/bambu_results"
+
+# Existing downstream results
+dge_dir: "/path/to/results/05_dge/dge_results"
+dtu_dir: "/path/to/results/06_dtu/dtu_results"
+usage_dir: "/path/to/results/07_isoform_usage/isoform_usage_results"
+structure_dir: "/path/to/results/08_isoform_structure_all/isoform_structure_results"
+
+# Reference
+ref_genome: "/path/to/GRCh38.fa"
+ref_annotation: "/path/to/annotation.gtf"
+
+# Output
+outdir: "/path/to/results"
+
+# Optional: leave unset for flexible cohort size
+expected_samples: null
+
+# Statistical models
+dge_design: "~ condition"
+dtu_design: "~ group"
+dju_design: "~ group"
+
+# Cohort analysis
+dtu_mode: "cohort"
+isoform_mode: "cohort"
+
+dtu_group_fraction: 0.25
+isoform_group_fraction: 0.25
+
+# Filtering
+functional_min_reads: 3
+functional_min_supported_samples: 2
+functional_group_fraction: 0.25
+
+# GSEA
+gsea_min_size: 10
+gsea_max_size: 500
+
+# Fusion
+fusion_min_spanning_reads: 2
+fusion_min_recurrent_samples: 2
+
+# Additional analysis thresholds
+dge_min_count: 10
+dge_min_samples: null
+dtu_coverage_min: 10
+isoform_min_gene_counts: 10
+junction_min_mapq: 10
+junction_min_intron: 20
+dju_min_count: 5
+dju_group_fraction: 0.25

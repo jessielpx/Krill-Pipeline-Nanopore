@@ -1,0 +1,4 @@
+collection	pathways	db_version	msigdbr_version	file
+Hallmark	50	2026.1.Hs	26.1.1	hallmark.gmt
+Reactome	1839	2026.1.Hs	26.1.1	reactome.gmt
+GO_BP	7538	2026.1.Hs	26.1.1	go_bp.gmt

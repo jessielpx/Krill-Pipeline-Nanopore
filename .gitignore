@@ -1,0 +1,47 @@
+# Nextflow runtime
+.nextflow/
+.nextflow.log*
+work/
+
+# Slurm and execution logs
+*.out
+*.err
+*.log
+
+# Backup and temporary files
+*.bak
+*.tmp
+*.swp
+*~
+.DS_Store
+
+# Python cache
+__pycache__/
+*.pyc
+
+# Sequencing data and large files
+*.fastq
+*.fastq.gz
+*.fq
+*.fq.gz
+*.bam
+*.bai
+*.cram
+*.mmi
+*.sif
+
+# Secrets and local settings
+.env
+.env.*
+
+# Generated output
+results/
+test_output/
+
+# User-specific pipeline configuration
+params.local.yaml
+params.*.local.yaml
+
+# Local pipeline configuration
+# Third-party MSigDB gene-set data
+assets/msigdb_human_ensembl/*.gmt

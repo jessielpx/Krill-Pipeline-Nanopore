@@ -2,9 +2,8 @@ nextflow.enable.dsl = 2
 
 /*
  * ==========================================
- * Krill Renew
- *
- * Nanopore long-read cDNA RNA-seq
+ * Krill
+ * Nanopore long-read RNA-seq
  * Basal Cell Carcinoma (BCC)
  *
  * CORE:
@@ -138,7 +137,7 @@ workflow {
         FUSION_MODE()
     }
     else if (params.stage == 'help') {
-        log.info "Krill Renew available stages: all, core, alignment, bambu, post_bambu, statistics, isoforms, functional, gsea, junction, fusion"
+        log.info "Krill available stages: all, core, alignment, bambu, post_bambu, statistics, isoforms, functional, gsea, junction, fusion"
     }
     else {
         error "Unsupported --stage: ${params.stage}"

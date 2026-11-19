@@ -1,51 +1,51 @@
 # External software installations
-sqanti_dir: "/path/to/SQANTI3"
-sqanti_env: "/path/to/sqanti3/environment"
-jaffal_home: "/path/to/JAFFA"
-jaffal_ref_dir: "/path/to/JAFFA/reference"
+sqanti_dir: "/home/peixiliu/links/projects/rrg-lefranco/shared/Peixi/software/SQANTI3-v6.0.2"
+sqanti_env: "/home/peixiliu/links/projects/rrg-lefranco/shared/Peixi/software/sqanti3-v6.0.2"
+jaffal_home: "/home/peixiliu/links/projects/rrg-lefranco/shared/Peixi/software/JAFFA-version-2.5"
+jaffal_ref_dir: "/home/peixiliu/links/projects/rrg-lefranco/shared/Peixi/software/JAFFA_reference_hg38_gencode49"
 
 # R / Bioconductor environment
-r_libs_user: "/path/to/R/library"
-bioconductor_config_file: "file:///path/to/bioconductor-config.yaml"
+r_libs_user: "/home/peixiliu/links/projects/rrg-lefranco/shared/Peixi/software/R_libs_4.6"
+bioconductor_config_file: "file:///home/peixiliu/links/projects/rrg-lefranco/shared/Peixi/software/bioconductor-config.yaml"
 
 # HPC account (replace with your own)
-slurm_account: "your-slurm-account"
+slurm_account: "def-lefranco"
 
-# Krill Renew - Example parameters
+# Krill - Example parameters
 #
 # Replace the example paths with your own.
 # Choose the workflow stage when launching Nextflow.
 
-stage: "alignment"
+stage: "all"
 read_type: "cdna"
 
 # Input data
-samplesheet: "/path/to/samplesheet.csv"
-raw_fastq_dir: "/path/to/raw_fastq_by_barcode"
-merged_fastq_dir: "/path/to/results/01_preprocessing/fastcat"
-bam_dir: "/path/to/results/01_preprocessing/alignment"
-bambu_dir: "/path/to/results/02_transcriptome/bambu_results"
+samplesheet: "/home/peixiliu/links/projects/rrg-lefranco/peixiliu/Nanopore/BCC_cohort91_261118/samplesheet.csv"
+raw_fastq_dir: null
+merged_fastq_dir: "/scratch/peixiliu/BCC_cohort91/results/01_preprocessing/fastcat"
+bam_dir: "/scratch/peixiliu/BCC_cohort91/results/01_preprocessing/alignment"
+bambu_dir: "/scratch/peixiliu/BCC_cohort91/results/02_transcriptome/bambu_results"
 
 # Existing downstream results
-dge_dir: "/path/to/results/05_dge/dge_results"
-dtu_dir: "/path/to/results/06_dtu/dtu_results"
-usage_dir: "/path/to/results/07_isoform_usage/isoform_usage_results"
-structure_dir: "/path/to/results/08_isoform_structure_all/isoform_structure_results"
+dge_dir: "/scratch/peixiliu/BCC_cohort91/results/05_dge/dge_results"
+dtu_dir: "/scratch/peixiliu/BCC_cohort91/results/06_dtu/dtu_results"
+usage_dir: "/scratch/peixiliu/BCC_cohort91/results/07_isoform_usage/isoform_usage_results"
+structure_dir: "/scratch/peixiliu/BCC_cohort91/results/08_isoform_structure_all/isoform_structure_results"
 
 # Reference
-ref_genome: "/path/to/GRCh38.fa"
-ref_annotation: "/path/to/annotation.gtf"
+ref_genome: "/home/peixiliu/links/projects/rrg-lefranco/shared/Peixi/references/Homo_sapiens.GRCh38.fa"
+ref_annotation: "/home/peixiliu/links/projects/rrg-lefranco/shared/Peixi/references/Homo_sapiens.GRCh38.Ensembl104.gtf"
 
 # Output
-outdir: "/path/to/results"
+outdir: "/scratch/peixiliu/BCC_cohort91/results"
 
 # Optional: leave unset for flexible cohort size
 expected_samples: null
 
 # Statistical models
 dge_design: "~ condition"
-dtu_design: "~ group"
-dju_design: "~ group"
+dtu_design: "~ condition"
+dju_design: "~ condition"
 
 # Cohort analysis
 dtu_mode: "cohort"

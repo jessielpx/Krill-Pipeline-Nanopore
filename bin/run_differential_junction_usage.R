@@ -148,6 +148,12 @@ for (name in names(samples)) {
 
 samples$group <- metadata$group
 
+# Ensure control is the reference for condition.
+samples$condition <- factor(
+    metadata$condition,
+    levels=levels
+)
+
 design_formula <- as.formula(design_text)
 
 design <- model.matrix(
@@ -162,9 +168,16 @@ if (qr(design)$rank != ncol(design)) {
     )
 }
 
-group_coef <- paste0(
-    "group", levels[2]
-)
+# Select the coefficient corresponding to the design.
+design_variables <- all.vars(design_formula)
+
+if ("condition" %in% design_variables) {
+    group_coef <- paste0("condition", levels[2])
+} else if ("group" %in% design_variables) {
+    group_coef <- paste0("group", levels[2])
+} else {
+    stop("DJU design must include condition or group")
+}
 
 if (!group_coef %in% colnames(design)) {
     stop(

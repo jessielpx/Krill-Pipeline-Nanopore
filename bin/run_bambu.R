@@ -133,6 +133,21 @@ annotation <- bambu::prepareAnnotations(
 bam_files <- Rsamtools::BamFileList(bam_paths)
 names(bam_files) <- manifest$sample
 
+# Initialize BiocFileCache before parallel workers start.
+# Prevent concurrent SQLite metadata table creation.
+if (nrow(manifest) > 10L) {
+    if (!requireNamespace("BiocFileCache", quietly = TRUE)) {
+        stop("BiocFileCache is required")
+    }
+
+    cache <- BiocFileCache::BiocFileCache(
+        tempdir(),
+        ask = FALSE
+    )
+
+    message("Initialized Bambu read-class cache: ", tempdir())
+}
+
 # Joint discovery and quantification.
 message("--- Starting bambu joint analysis ---")
 

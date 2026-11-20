@@ -1,3 +1,4 @@
+include { MSIGDB_PREPARE } from '../modules/local/msigdb_prepare/main'
 nextflow.enable.dsl = 2
 
 include { CORE } from '../subworkflows/core'
@@ -455,20 +456,17 @@ workflow KRILL_CORE {
             )
         }
 
-        def gmt_location = params.gsea_gmt_dir ?:
-            "${projectDir}/assets/msigdb_human_ensembl"
+        def gsea_script = Channel.value(
+            file("${projectDir}/bin/run_gsea.R",
+                 checkIfExists: true)
+        )
+
+        MSIGDB_PREPARE(gsea_script)
 
         GSEA(
             DGE.out.results,
-            Channel.value(
-                file(gmt_location, checkIfExists: true)
-            ),
-            Channel.value(
-                file(
-                    "${projectDir}/bin/run_gsea.R",
-                    checkIfExists: true
-                )
-            )
+            MSIGDB_PREPARE.out.gmt_dir,
+            gsea_script
         )
     }
 

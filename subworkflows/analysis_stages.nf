@@ -1,3 +1,4 @@
+include { MSIGDB_PREPARE } from '../modules/local/msigdb_prepare/main'
 nextflow.enable.dsl = 2
 
 include { DGE } from '../modules/local/dge/main'
@@ -222,32 +223,19 @@ workflow GSEA_MODE {
         checkIfExists: true
     )
 
-    def gmt_location = params.gsea_gmt_dir ?:
-        "${projectDir}/assets/msigdb_human_ensembl"
-
-    def gmt = file(
-        gmt_location,
-        checkIfExists: true
-    )
-
     if (!file("${dge}/dge_HR_vs_control.tsv").exists())
         error "Missing DGE results"
 
-    [
-        'hallmark.gmt',
-        'reactome.gmt',
-        'go_bp.gmt'
-    ].each { name ->
-        if (!file("${gmt}/${name}").exists())
-            error "Missing GMT file: ${name}"
-    }
+    def gsea_script = Channel.value(
+        file("${projectDir}/bin/run_gsea.R",
+             checkIfExists: true)
+    )
+
+    MSIGDB_PREPARE(gsea_script)
 
     GSEA(
         Channel.value(dge),
-        Channel.value(gmt),
-        Channel.value(file(
-            "${projectDir}/bin/run_gsea.R",
-            checkIfExists: true
-        ))
+        MSIGDB_PREPARE.out.gmt_dir,
+        gsea_script
     )
 }

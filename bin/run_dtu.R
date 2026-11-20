@@ -117,8 +117,8 @@ if (length(design_formula) != 2L) {
 
 design_variables <- all.vars(design_formula)
 
-if (!"group" %in% design_variables) {
-    stop("Design must contain group")
+if (!any(c("condition", "group") %in% design_variables)) {
+    stop("Design must contain condition or group")
 }
 
 message("========================================")
@@ -228,6 +228,10 @@ if (any(group_sizes < 2L)) {
 
 samples <- data.frame(
     sample_id = meta$sample,
+    condition = factor(
+        meta$condition,
+        levels = c("control", "HR")
+    ),
     group = factor(
         meta$condition,
         levels = c("control", "HR")
@@ -397,10 +401,16 @@ if (nrow(full) <= ncol(full)) {
     )
 }
 
-if (!"groupHR" %in% colnames(full)) {
+comparison_coef <- if ("condition" %in% design_variables) {
+    "conditionHR"
+} else {
+    "groupHR"
+}
+
+if (!comparison_coef %in% colnames(full)) {
     stop(
-        "Missing groupHR coefficient. ",
-        "Use group as a main effect with control reference."
+        "Missing comparison coefficient: ",
+        comparison_coef
     )
 }
 
@@ -634,7 +644,7 @@ message("Testing HR vs control")
 
 d <- DRIMSeq::dmTest(
     d,
-    coef = "groupHR",
+    coef = comparison_coef,
     BPPARAM = bp
 )
 

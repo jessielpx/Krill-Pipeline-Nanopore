@@ -1,10 +1,15 @@
 /*
- * Krill Renew - Build minimap2 genome index
+ * Krill - Build minimap2 genome index
  *
  * Reference: GRCh38
  * Sequencing: Nanopore cDNA RNA-seq
+ * Builds a splice-aware minimap2 genome index (.mmi) from the reference FASTA for downstream long-read spliced alignment.
  *
- * Native execution on Rorqual
+ * Input:
+ *    - path reference_fasta: Reference genome FASTA (e.g., GRCh38)
+ *
+ * Output:
+ *    - path "reference.mmi": Pre-built minimap2 splice index file
  */
 
 process BUILD_MINIMAP2_INDEX {

@@ -27,6 +27,7 @@ process MINIMAP2_ALIGN {
     input:
     tuple val(meta), path(reads)
     path minimap_index
+    path reference_gtf
 
     output:
     tuple val(meta),
@@ -64,12 +65,17 @@ process MINIMAP2_ALIGN {
     echo "samtools version:"
     samtools --version | head -n 1
 
+    test -s "${reference_gtf}"
+    paftools.js gff2bed "${reference_gtf}" > junctions.bed
+    test -s junctions.bed
+
     # Splice-aware alignment for Nanopore cDNA.
     # -ub searches both orientations for canonical splice sites.
 
     minimap2 \\
         -ax splice \\
         -ub \\
+        --junc-bed junctions.bed \\
         -t 6 \\
         "${minimap_index}" \\
         "${reads}" \\

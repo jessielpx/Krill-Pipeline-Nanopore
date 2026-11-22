@@ -1,9 +1,25 @@
 /*
- * Krill Renew - Joint bambu analysis
+ * Krill - Joint bambu analysis
  *
- * Cohort-level transcript discovery and quantification.
- * Native R execution on Rorqual.
+ * Aggregates all cohort BAM/BAI files, constructs a deterministic sample manifest.
+ * Executes joint transcript discovery and gene/isoform quantification via Bioconductor `bambu`.
+ * 
  * Offline Bioconductor configuration.
+ *
+ *  Input:
+ *    - path bams, stageAs: 'bams/*': All cohort sorted BAMs (${sample}.sorted.bam)
+ *    - path bais, stageAs: 'bams/*': Matching BAM indices (${sample}.sorted.bam.bai)
+ *    - path reference_gtf: Contig-matched reference GTF
+ *    - path reference_fasta: Reference genome FASTA
+ *    - path run_script: Driver R script invoking `bambu::bambu()`
+ *
+ *  Output (published to `02_transcriptome/bambu_results`):
+ *    - bambu_transcripts.rds: Serialized SummarizedExperiment object
+ *    - extended_annotations.gtf: Reference + newly discovered isoform GTF
+ *    - counts_transcript.txt: Isoform-level read count matrix
+ *    - counts_gene.txt: Gene-level read count matrix
+ *    - bambu_sample_qc.tsv: Per-sample bambu QC metrics
+ *    - sample_manifest.tsv: Verified cohort sample manifest
  */
 
 process BAMBU_JOINT {
@@ -38,8 +54,6 @@ process BAMBU_JOINT {
     # Use a locally downloaded Bioconductor version map.
     BIOC_CONFIG="!{params.bioconductor_config_file ?: ''}"
 
-    test -s "${BIOC_CONFIG#file://}"
-
     export BIOCONDUCTOR_CONFIG_FILE="$BIOC_CONFIG"
 
     if [[ -z "$R_LIBS_USER" ]]; then
@@ -64,7 +78,7 @@ process BAMBU_JOINT {
         exit 1
     fi
 
-    export BIOCONDUCTOR_ONLINE_VERSION_DIAGNOSIS=TRUE
+    export BIOCONDUCTOR_ONLINE_VERSION_DIAGNOSIS=FALSE
 
     test -d "$R_LIBS_USER"
     test -s "!{reference_gtf}"

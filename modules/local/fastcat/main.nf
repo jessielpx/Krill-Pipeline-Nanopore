@@ -1,10 +1,18 @@
 /*
- * Krill - FASTQ preparation
+ * Krill - Nanopore FASTQ preparation (Fastcat replacement)
  *
- * Merge FASTQ files from one sample into one FASTQ file.
- * Generate basic read QC.
+ * Merges multiple split FASTQ/FASTQ.GZ files from a single Nanopore sample into one compressed FASTQ file.
+ * Performs strict 4-line record validation and generates basic per-file QC statistics.
  *
- * It's a replacement for the fastcat software. Fastcat requires a container to run in Rorqual, while the container is hard to install.
+ * It's a pure-Python replacement for ONT's `fastcat` to avoid container compatibility issues on the Rorqual cluster.
+ *
+ * Input:
+ *   tuple val(meta), path(read_dir)  - Directory containing split FASTQ files (.fastq, .fq, .fastq.gz, .fq.gz) for one sample.
+ *
+ * Output:
+ *   merged_fastq/${meta.sample}.fastq.gz  - Merged, gzip-compressed (level 1) FASTQ.
+ *   fastcat_stats/per-file-stats.tsv      - Read/base counts, min/max length, mean Q-score.
+ *   fastcat_stats/validation.tsv          - Summary check of total input files and reads.
  */
 
 process FASTCAT {

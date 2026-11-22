@@ -48,7 +48,8 @@ workflow GENOME_ALIGNMENT {
      */
     MINIMAP2_ALIGN(
         merged_fastq_ch,
-        genome_index_ch
+        genome_index_ch,
+        PREPROCESS_ANNOTATION.out.cleaned_gtf
     )
 
     /*

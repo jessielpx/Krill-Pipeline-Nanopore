@@ -1,4 +1,4 @@
-# Krill Renew - Joint bambu transcriptome analysis
+# Krill - Joint bambu transcriptome analysis
 
 args <- commandArgs(trailingOnly = TRUE)
 
@@ -158,7 +158,8 @@ se <- bambu::bambu(
     discovery = TRUE,
     quant = TRUE,
     ncore = workers,
-    stranded = FALSE
+    stranded = FALSE，
+    lowMemory = TRUE
 )
 
 if (ncol(se) != nrow(manifest)) {

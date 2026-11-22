@@ -1,10 +1,18 @@
 /*
- * Krill Renew - Reference annotation preparation
+ * Krill - Reference annotation preparation
  *
- * Filter Ensembl GTF to match reference genome contigs.
- * Preserve original gene IDs, transcript IDs and attributes.
+ * Filters a gene annotation GTF file to retain only records on contigs present in the target reference genome FASTA
+ * Preserve all original gene/transcript IDs and attributes.
  *
- * Native execution on Rorqual.
+ * Input:
+ *    - path annotation_gtf: Uncompressed reference annotation file (.gtf)
+ *    - path reference_fasta: Uncompressed reference genome FASTA (.fa/.fasta)
+ *
+ * Output:
+ *    - annotation.cleaned.gtf: Contig-synchronized GTF annotation
+ *    - annotation_qc/reference_contigs.txt: Whitelist of contigs from FASTA
+ *    - annotation_qc/summary.tsv: Counts of retained/removed features
+ *    - annotation_qc/removed_contigs.tsv: Breakdown of dropped contigs
  */
 
 process PREPROCESS_ANNOTATION {

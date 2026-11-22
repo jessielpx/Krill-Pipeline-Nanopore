@@ -1,7 +1,14 @@
 /*
- * Krill Renew - BAM indexing and alignment QC
+ * Krill - BAM indexing and alignment QC
  *
- * Native execution on Rorqual
+ * Validates coordinate-sorted BAM files, generates `.bai` index files, and computes alignment summary metrics via samtools flagstat and idxstats.
+ * 
+ * Input:
+ *    - tuple val(meta), path(bam): Sample metadata & coordinate-sorted BAM (expected filename: ${sample}.sorted.bam)
+ *
+ * Output:
+ *    - tuple val(meta), path("${sample}.sorted.bam"), path("${sample}.sorted.bam.bai")
+ *    - tuple val(meta), path("${sample}.flagstat.txt"), path("${sample}.idxstats.txt")
  */
 
 process SAMTOOLS_INDEX {

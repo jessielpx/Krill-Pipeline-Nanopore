@@ -1,10 +1,15 @@
 /*
- * Krill Renew - Genome alignment
+ * Krill - Minimap2 alignment
  *
- * Nanopore cDNA RNA-seq
- * minimap2 -> coordinate-sorted BAM
+ * Aligns merged Nanopore cDNA reads against the pre-built minimap2 genome index (.mmi) in splice-aware mode and streams directly into coordinate-sorted BAM format.
  *
- * Native Rorqual execution (no containers)
+ * Input:
+ *    - tuple val(meta), path(reads): Sample metadata & merged FASTQ (.fastq.gz)
+ *    - path minimap_index: Pre-built minimap2 splice index (.mmi)
+ *
+ * Output:
+ *    - tuple val(meta), path("${sample}.sorted.bam"): Coordinate-sorted BAM
+ *    - tuple val(meta), path("${sample}.minimap2.log"): Alignment stderr log
  */
 
 process MINIMAP2_ALIGN {

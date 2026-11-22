@@ -1,11 +1,10 @@
 /*
- * Krill Renew - FASTQ preparation
+ * Krill - FASTQ preparation
  *
- * Merge FASTQ files belonging to one sample.
+ * Merge FASTQ files from one sample into one FASTQ file.
  * Generate basic read QC.
  *
- * Native execution on Rorqual.
- * No FASTCAT binary or container required.
+ * It's a replacement for the fastcat software. Fastcat requires a container to run in Rorqual, while the container is hard to install.
  */
 
 process FASTCAT {
@@ -32,9 +31,7 @@ process FASTCAT {
 
     def sample = meta.sample.toString()
 
-    if (!(sample ==~ /[A-Za-z0-9._-]+/)) {
-        error "Invalid sample ID: ${sample}"
-    }
+    if (!(sample ==~ /[A-Za-z0-9._-]+/)) {error "Invalid sample ID: ${sample}"}
 
     """
     set -euo pipefail

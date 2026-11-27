@@ -1,12 +1,12 @@
 # External software installations
-sqanti_dir: "/home/peixiliu/links/projects/rrg-lefranco/shared/Peixi/software/SQANTI3-v6.0.2"
-sqanti_env: "/home/peixiliu/links/projects/rrg-lefranco/shared/Peixi/software/sqanti3-v6.0.2"
-jaffal_home: "/home/peixiliu/links/projects/rrg-lefranco/shared/Peixi/software/JAFFA-version-2.5"
-jaffal_ref_dir: "/home/peixiliu/links/projects/rrg-lefranco/shared/Peixi/software/JAFFA_reference_hg38_gencode49"
+sqanti_dir: "/lustre09/project/6070433/shared/Peixi/software/SQANTI3-v6.0.2"
+sqanti_env: "/lustre09/project/6070433/shared/Peixi/software/sqanti3-v6.0.2"
+jaffal_home: "/lustre09/project/6070433/shared/Peixi/software/JAFFA-version-2.5"
+jaffal_ref_dir: "/lustre09/project/6070433/shared/Peixi/software/JAFFA_reference_hg38_gencode49"
 
 # R / Bioconductor environment
-r_libs_user: "/home/peixiliu/links/projects/rrg-lefranco/shared/Peixi/software/R_libs_4.6"
-bioconductor_config_file: "file:///home/peixiliu/links/projects/rrg-lefranco/shared/Peixi/software/bioconductor-config.yaml"
+r_libs_user: "/lustre09/project/6070433/shared/Peixi/software/R_libs_4.6"
+bioconductor_config_file: "file:///lustre09/project/6070433/shared/Peixi/software/bioconductor-config.yaml"
 
 # HPC account (replace with your own)
 slurm_account: "def-lefranco"
@@ -33,8 +33,8 @@ usage_dir: "/scratch/peixiliu/BCC_cohort91/results/07_isoform_usage/isoform_usag
 structure_dir: "/scratch/peixiliu/BCC_cohort91/results/08_isoform_structure_all/isoform_structure_results"
 
 # Reference
-ref_genome: "/home/peixiliu/links/projects/rrg-lefranco/shared/Peixi/references/Homo_sapiens.GRCh38.fa"
-ref_annotation: "/home/peixiliu/links/projects/rrg-lefranco/shared/Peixi/references/Homo_sapiens.GRCh38.Ensembl104.gtf"
+ref_genome: "/lustre09/project/6070433/shared/Peixi/references/Homo_sapiens.GRCh38.fa"
+ref_annotation: "/lustre09/project/6070433/shared/Peixi/references/Homo_sapiens.GRCh38.Ensembl104.gtf"
 
 # Output
 outdir: "/scratch/peixiliu/BCC_cohort91/results"
